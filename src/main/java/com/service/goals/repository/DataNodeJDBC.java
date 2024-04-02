@@ -34,8 +34,8 @@ public class DataNodeJDBC {
             if(dataNodeDTO.getChildren() != null){
                 String dataNodeRelationsQuery = "INSERT INTO dn_relations (parentid, childid) VALUES (?, ?)";
                 List<Long> children = dataNodeDTO.getChildren();
-                for (Long child : children) {
-                    jdbcTemplate.update(dataNodeRelationsQuery, dataNodeId, child);
+                for (int i = 0; i < children.size(); i++) {
+                    jdbcTemplate.update(dataNodeRelationsQuery, dataNodeId, children.get(i));
                 }
             }
             return dataNodeId;
@@ -117,8 +117,8 @@ public class DataNodeJDBC {
                 String deleteQuery = "DELETE FROM dn_relations WHERE parentID = ?";
                 jdbcTemplate.update(deleteQuery, id);
                 String insertQuery = "INSERT INTO dn_relations (parentID, childID) VALUES (?, ?)";
-                for (Long child : children) {
-                    jdbcTemplate.update(insertQuery, id, child);
+                for (int i = 0; i < children.size(); i++) {
+                    jdbcTemplate.update(insertQuery, id, children.get(i));
                 }
             }
             return true;
