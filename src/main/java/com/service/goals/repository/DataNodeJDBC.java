@@ -34,8 +34,8 @@ public class DataNodeJDBC {
             if(dataNodeDTO.getChildren() != null){
                 String dataNodeRelationsQuery = "INSERT INTO dn_relations (parentid, childid) VALUES (?, ?)";
                 List<Long> children = dataNodeDTO.getChildren();
-                for (int i = 0; i < children.size(); i++) {
-                    jdbcTemplate.update(dataNodeRelationsQuery, dataNodeId, children.get(i));
+                for (Long child : children) {
+                    jdbcTemplate.update(dataNodeRelationsQuery, dataNodeId, child);
                 }
             }
             return dataNodeId;
@@ -61,8 +61,8 @@ public class DataNodeJDBC {
 
     public Map<String, Object> getDataNodeDetails(Long id) {
         try {
-            StringBuilder queryBuilder = new StringBuilder("SELECT * FROM data_node WHERE id = ?");
-            Map<String, Object> result = jdbcTemplate.queryForMap(queryBuilder.toString(), id);
+            String query = "SELECT * FROM data_node WHERE id = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(query, id);
             result.put("children", getChildDetails((Long) result.get("id")));
             return result;
         } catch (DataAccessException e) {
@@ -117,8 +117,8 @@ public class DataNodeJDBC {
                 String deleteQuery = "DELETE FROM dn_relations WHERE parentID = ?";
                 jdbcTemplate.update(deleteQuery, id);
                 String insertQuery = "INSERT INTO dn_relations (parentID, childID) VALUES (?, ?)";
-                for (int i = 0; i < children.size(); i++) {
-                    jdbcTemplate.update(insertQuery, id, children.get(i));
+                for (Long child : children) {
+                    jdbcTemplate.update(insertQuery, id, child);
                 }
             }
             return true;

@@ -130,7 +130,7 @@ public class EntityNodeJDBC {
                     properties.put(propertyName, row.get("property_value"));
                 }
 
-                entityDataNodeMap.put(Long.valueOf(entityDataNodeId), entityDataNodeDTO);
+                entityDataNodeMap.put(entityDataNodeId, entityDataNodeDTO);
             }
 
             return new ArrayList<>(entityDataNodeMap.values());
@@ -174,7 +174,7 @@ public class EntityNodeJDBC {
                     properties.put(propertyName, row.get("property_value"));
                 }
 
-                entityDataNodeMap.put(Long.valueOf(entityDataNodeId), entityDataNodeDTO);
+                entityDataNodeMap.put(entityDataNodeId, entityDataNodeDTO);
             }
 
             return entityDataNodeMap.isEmpty() ? null : entityDataNodeMap.values().iterator().next();
@@ -197,7 +197,7 @@ public class EntityNodeJDBC {
 
             // Check each field in the filter DTO and add conditions to the WHERE clause accordingly
             if (filters.getId() != null) {
-                queryBuilder.append(hasWhere ? " AND " : " WHERE ");
+                queryBuilder.append(" WHERE ");
                 queryBuilder.append("ed.id = ?");
                 queryParams.add(filters.getId());
                 hasWhere = true;
@@ -218,15 +218,9 @@ public class EntityNodeJDBC {
                 queryBuilder.append(hasWhere ? " AND " : " WHERE ");
                 queryBuilder.append("ed.node_type = ?");
                 queryParams.add(filters.getEntityType());
-                hasWhere = true;
             }
-            // Repeat similar checks for other fields in the filter DTO
-
-            // Execute the query
             String query = queryBuilder.toString();
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, queryParams.toArray());
-
-            // Map query result to DTO objects
             List<EntityDataNodeDTO> entityDataNodeDTOs = new ArrayList<>();
             for (Map<String, Object> row : rows) {
                 EntityDataNodeDTO entityDataNodeDTO = mapRowToEntityDataNodeDTO(row);
