@@ -1,10 +1,15 @@
 package com.service.goals.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
 
     public static final String OK = "Ok";
     public static final String ERROR = "Error";
     public static final String SUCCESS = "Success";
+    public static final List<String> NODETYPE_ENUM = new ArrayList<>(Arrays.asList("objective", "keyresult", "initiative"));
 
 
     public interface Endpoints {
