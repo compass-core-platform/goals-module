@@ -1,6 +1,8 @@
 package com.service.goals.repository;
 
 import com.service.goals.dto.EntityDataNodeDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +16,7 @@ import java.util.Map;
 @Repository
 public class EntityNodeJDBC {
     private final JdbcTemplate jdbcTemplate;
+    private Logger logger = LoggerFactory.getLogger(EntityNodeJDBC.class);
 
     @Autowired
     public EntityNodeJDBC(JdbcTemplate jdbcTemplate){
@@ -28,7 +31,8 @@ public class EntityNodeJDBC {
                     entityDataNodeDTO.getEntityId(), entityDataNodeDTO.getEntityType(),
                     entityDataNodeDTO.getDataNodeId(), entityDataNodeDTO.getNodeType(),
                     entityDataNodeDTO.getCreatedBy(), entityDataNodeDTO.getUpdatedBy());
-
+            logger.info("Create Entity "+ entityDataNodeQuery);
+            logger.info("entity data node id :"+ entityDataNodeId);
             String ednPropertyQuery = "INSERT INTO edn_property (entity_data_node_id, property_name, property_value) VALUES (?, ?, ?)";
             Map<String, Object> props = entityDataNodeDTO.getProperties();
             for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -76,7 +80,7 @@ public class EntityNodeJDBC {
             params.add(entityDataNodeDTO.getUpdatedBy());
             params.add(id);
             jdbcTemplate.update(updateQuery.toString(), params.toArray());
-
+            logger.info("Update entity query "+ updateQuery);
             List<Map<String,Object>> properties = List.of(entityDataNodeDTO.getProperties());
             if (properties != null) {
                 // Delete existing relations for the data node
@@ -149,7 +153,7 @@ public class EntityNodeJDBC {
 
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, id);
             Map<Long, EntityDataNodeDTO> entityDataNodeMap = new HashMap<>();
-
+            logger.info("Get entity by id : "+ rows);
             for (Map<String, Object> row : rows) {
                 Long entityDataNodeId = (Long) row.get("entity_data_node_id");
                 EntityDataNodeDTO entityDataNodeDTO = entityDataNodeMap.getOrDefault(entityDataNodeId, new EntityDataNodeDTO());
@@ -220,14 +224,13 @@ public class EntityNodeJDBC {
                 queryParams.add(filters.getEntityType());
             }
             String query = queryBuilder.toString();
+            logger.info("Filter search query"+ query);
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, queryParams.toArray());
             List<EntityDataNodeDTO> entityDataNodeDTOs = new ArrayList<>();
             for (Map<String, Object> row : rows) {
                 EntityDataNodeDTO entityDataNodeDTO = mapRowToEntityDataNodeDTO(row);
                 entityDataNodeDTOs.add(entityDataNodeDTO);
             }
-
-            // Return list of DTO objects
             return entityDataNodeDTOs;
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -246,7 +249,7 @@ public class EntityNodeJDBC {
         entityDataNodeDTO.setCreatedOn((String) row.get("created_on"));
         entityDataNodeDTO.setUpdatedBy((String) row.get("updated_by"));
         entityDataNodeDTO.setUpdatedOn((String) row.get("updated_on"));
-
+        logger.info("map Rwo to Entity DTO : "+ entityDataNodeDTO);
         // Create or retrieve properties map
         Map<String, Object> properties = entityDataNodeDTO.getProperties();
         if (properties == null) {

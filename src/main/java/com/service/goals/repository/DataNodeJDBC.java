@@ -5,15 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public class DataNodeJDBC {
     private final JdbcTemplate jdbcTemplate;
+    private Logger logger = LoggerFactory.getLogger(DataNodeJDBC.class);
 
     @Autowired
     public DataNodeJDBC(JdbcTemplate jdbcTemplate) {
@@ -27,10 +29,10 @@ public class DataNodeJDBC {
 
     public Long insertRecord(DataNodeDTO dataNodeDTO) {
         try {
-            // Insert into DataNodes table
             String dataNodeQuery = "INSERT INTO data_node (name, description, code, node_type, created_on, created_by, updated_on, updated_by) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?) RETURNING id";
             Long dataNodeId = jdbcTemplate.queryForObject(dataNodeQuery, Long.class, dataNodeDTO.getName(), dataNodeDTO.getDescription(), dataNodeDTO.getCode(), dataNodeDTO.getNodeType(), "admin", "admin");
-
+            logger.info("Create Datanode Query : "+ dataNodeQuery);
+            logger.info("data node ID : " + dataNodeId);
             if(dataNodeDTO.getChildren() != null){
                 String dataNodeRelationsQuery = "INSERT INTO dn_relations (parentid, childid) VALUES (?, ?)";
                 List<Long> children = dataNodeDTO.getChildren();
@@ -45,7 +47,6 @@ public class DataNodeJDBC {
     }
 
     public List<Map<String, Object>> gelAllDetails() {
-
         try {
             String query = "SELECT * FROM data_node";
             List<Map<String, Object>> results = jdbcTemplate.queryForList(query);
@@ -53,6 +54,7 @@ public class DataNodeJDBC {
                 Long id = (Long) result.get("id");
                 result.put("children", getChildDetails(id));
             }
+            logger.info("List All Datanode : "+ results);
             return results;
         } catch (DataAccessException e) {
             throw new RuntimeException(e.getMessage());
@@ -64,6 +66,8 @@ public class DataNodeJDBC {
             String query = "SELECT * FROM data_node WHERE id = ?";
             Map<String, Object> result = jdbcTemplate.queryForMap(query, id);
             result.put("children", getChildDetails((Long) result.get("id")));
+            logger.info("List Datanode ID id : "+ id);
+            logger.info("List Datanode By Id : "+ result);
             return result;
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -81,8 +85,6 @@ public class DataNodeJDBC {
             if (count == 0) {
                 throw new RuntimeException("Record with id " + id + " does not exist. Update aborted.");
             }
-//            String retrieveExistingQuery = "SELECT * FROM data_node WHERE id = ?";
-//            Map<String, Object> existingDataNode = jdbcTemplate.queryForMap(retrieveExistingQuery, id);
             StringBuilder updateQuery = new StringBuilder("UPDATE data_node SET ");
             List<Object> params = new ArrayList<>();
 
@@ -131,7 +133,6 @@ public class DataNodeJDBC {
         try {
             StringBuilder queryBuilder = new StringBuilder("SELECT * FROM data_node");
             List<Object> queryParams = new ArrayList<>();
-
             if (!filters.isEmpty()) {
                 queryBuilder.append(" WHERE ");
                 int index = 0;
@@ -150,12 +151,12 @@ public class DataNodeJDBC {
             }
 
             String query = queryBuilder.toString();
+            logger.info("Filter query : "+ query);
             List<Map<String, Object>> result = jdbcTemplate.queryForList(query, queryParams.toArray());
             for (Map<String, Object> node : result) {
-
                 node.put("children", getChildDetails((Long) node.get("id")));
             }
-
+            logger.info("Filter Result"+ result);
             return result;
         } catch (DataAccessException e) {
             throw new RuntimeException(e.getMessage());

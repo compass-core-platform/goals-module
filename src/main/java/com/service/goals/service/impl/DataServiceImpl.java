@@ -6,8 +6,11 @@ import com.service.goals.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.service.goals.utils.Constants.NODETYPE_ENUM;
 
 
 @Service
@@ -26,12 +29,19 @@ public class DataServiceImpl implements DataService {
         return true;
     }
     @Override
-    public boolean createNode(DataNodeDTO dataNodeDTO) {
+    public Map<String,Object> createNode(DataNodeDTO dataNodeDTO) {
         try {
-                dataNodeJDBC.insertRecord(dataNodeDTO);
-            return true;
+            if(NODETYPE_ENUM.contains(dataNodeDTO.getNodeType())){
+                Long id = dataNodeJDBC.insertRecord(dataNodeDTO);
+                Map<String,Object> result = new HashMap<>();
+                result.put("id",id);
+                return result;
+            }
+            else {
+                throw new RuntimeException("Invalid Node Type");
+            }
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 

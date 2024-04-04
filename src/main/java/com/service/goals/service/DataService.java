@@ -9,7 +9,7 @@ import java.util.Map;
 public interface DataService {
     boolean retireNode(Long id);
 
-    boolean createNode(DataNodeDTO dataNodeDTO);
+    Map<String,Object> createNode(DataNodeDTO dataNodeDTO);
 
     List<Map<String, Object>> readAllNodes();
 
