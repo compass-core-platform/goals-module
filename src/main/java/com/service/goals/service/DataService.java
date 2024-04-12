@@ -11,9 +11,11 @@ public interface DataService {
 
     Map<String,Object> createNode(DataNodeDTO dataNodeDTO);
 
-    List<Map<String, Object>> readAllNodes();
+    List<DataNodeDTO> readAllNodes();
 
-    Map<String,Object> readNodeById(Long id);
+    List<DataNodeDTO> readNodeType(String type);
+
+    DataNodeDTO readNodeById(Long id);
 
     Boolean updateNode(Long id, DataNodeDTO dataNodeDTO);
 

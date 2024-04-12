@@ -23,22 +23,22 @@ public class DataServiceImpl implements DataService {
         this.dataNodeJDBC = dataNodeJDBC;
     }
 
+
     @Override
-    public boolean retireNode(Long id){
-        dataNodeJDBC.deleteRecord(id);
-        return true;
-    }
-    @Override
-    public Map<String,Object> createNode(DataNodeDTO dataNodeDTO) {
+    public Map<String, Object> createNode(DataNodeDTO dataNodeDTO) {
         try {
-            if(NODETYPE_ENUM.contains(dataNodeDTO.getNodeType())){
-                Long id = dataNodeJDBC.insertRecord(dataNodeDTO);
-                Map<String,Object> result = new HashMap<>();
-                result.put("id",id);
-                return result;
-            }
-            else {
-                throw new RuntimeException("Invalid Node Type");
+            if (dataNodeDTO.getCode() != null && dataNodeDTO.getName() != null && dataNodeDTO.getDescription() != null && dataNodeDTO.getCreatedOn() != null) {
+                if (NODETYPE_ENUM.contains(dataNodeDTO.getNodeType())) {
+                    Long id = dataNodeJDBC.insertRecord(dataNodeDTO);
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("id", id);
+                    return result;
+                }
+                else {
+                    throw new RuntimeException("Invalid node type : accepted values [ objective, keyresult, initiative] ");
+                }
+            } else {
+                throw new RuntimeException("Mandatory parameter Missing");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -46,15 +46,25 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Map<String, Object>> readAllNodes(){
+    public List<DataNodeDTO> readAllNodes() {
         try {
-            return dataNodeJDBC.gelAllDetails();
+            return dataNodeJDBC.getAllDetails();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     @Override
-    public Map<String,Object> readNodeById(Long id){
+    public List<DataNodeDTO> readNodeType(String type) {
+        try {
+            return dataNodeJDBC.getDataByType(type);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public DataNodeDTO readNodeById(Long id) {
         try {
             return dataNodeJDBC.getDataNodeDetails(id);
         } catch (Exception e) {
@@ -63,7 +73,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Boolean updateNode(Long id, DataNodeDTO dataNodeDTO){
+    public Boolean updateNode(Long id, DataNodeDTO dataNodeDTO) {
         try {
             return dataNodeJDBC.updateRecord(id, dataNodeDTO);
         } catch (Exception e) {
@@ -72,9 +82,19 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Map<String,Object>> filterSearch(Map<String, Object> filter){
+    public List<Map<String, Object>> filterSearch(Map<String, Object> filter) {
         try {
             return dataNodeJDBC.getFilteredDetails(filter);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean retireNode(Long id) {
+        try {
+            dataNodeJDBC.deleteDataNodeById(id);
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

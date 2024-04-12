@@ -79,7 +79,7 @@ public class EntityDataServiceImpl implements EntityDataService {
     @Override
     public boolean deleteEntityNode(Long id) {
         try {
-            return true;
+            return entityNodeJDBC.deleteEntityById(id);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
