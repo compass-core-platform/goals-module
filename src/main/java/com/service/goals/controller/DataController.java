@@ -35,14 +35,26 @@ public class DataController {
         }
     }
     @GetMapping(Endpoints.READ_ALL)
-    public ResponseEntity<Response<List<Map<String,Object>>>> getAllRecord() {
+    public ResponseEntity<Response<List<DataNodeDTO>>> getAllRecord() {
         try {
             logger.info("Read All Node API Controller");
-            List<Map<String,Object>> result = dataService.readAllNodes();
-            Response<List<Map<String,Object>>> response = new Response<>(Constants.SUCCESS, null, HttpStatus.OK.value(), result);
+            List<DataNodeDTO> result = dataService.readAllNodes();
+            Response<List<DataNodeDTO>> response = new Response<>(Constants.SUCCESS, null, HttpStatus.OK.value(), result);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Response<List<Map<String,Object>>> errorResponse = new Response<>(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            Response<List<DataNodeDTO>> errorResponse = new Response<>(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+    @GetMapping("/read/type/")
+    public ResponseEntity<Response<List<DataNodeDTO>>> getAllRecord(@RequestParam String nodeType) {
+        try {
+            logger.info("Read NodeType API Controller");
+            List<DataNodeDTO> result = dataService.readNodeType(nodeType);
+            Response<List<DataNodeDTO>> response = new Response<>(Constants.SUCCESS, null, HttpStatus.OK.value(), result);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Response<List<DataNodeDTO>> errorResponse = new Response<>(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -59,14 +71,14 @@ public class DataController {
         }
     }
     @GetMapping(Endpoints.READ_BY_ID)
-    public ResponseEntity<Response<Map<String,Object>>> getRecord(@RequestParam Long id) {
+    public ResponseEntity<Response<DataNodeDTO>> getRecord(@RequestParam Long id) {
         try {
             logger.info("Read By ID Node API Controller");
-            Map<String,Object> result = dataService.readNodeById(id);
-            Response<Map<String,Object> > response = new Response<>(Constants.SUCCESS, null, HttpStatus.OK.value(), result);
+            DataNodeDTO result = dataService.readNodeById(id);
+            Response<DataNodeDTO > response = new Response<>(Constants.SUCCESS, null, HttpStatus.OK.value(), result);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Response<Map<String,Object>> errorResponse = new Response<>(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            Response<DataNodeDTO> errorResponse = new Response<>(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }

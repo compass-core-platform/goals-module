@@ -4,15 +4,23 @@ import java.util.List;
 import java.util.Map;
 
 public class DataNodeDTO {
+    private Long id;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
     private String name;
     private String description;
     private String code;
     private String nodeType;
     private List children;
     private String createdBy;
-    private Long createdOn;
+    private String createdOn;
     private String updatedBy;
-    private Long updatedOn;
+    private String updatedOn;
 
     public String getName() {
         return name;
@@ -62,11 +70,11 @@ public class DataNodeDTO {
         this.createdBy = createdBy;
     }
 
-    public Long getCreatedOn() {
+    public String getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Long createdOn) {
+    public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
 
@@ -78,11 +86,11 @@ public class DataNodeDTO {
         this.updatedBy = updatedBy;
     }
 
-    public Long getUpdatedOn() {
+    public String getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(Long updatedOn) {
+    public void setUpdatedOn(String updatedOn) {
         this.updatedOn = updatedOn;
     }
 
